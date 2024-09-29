@@ -19,6 +19,7 @@ class MelSpectrogramFixed(torch.nn.Module):
         outputs = torch.log(self.torchaudio_backend(x) + 0.001) 
         return outputs[..., :-1] 
 
+
 # "sampling_rate": 16000,
 # "filter_length": 1280,
 # "hop_length": 320,
@@ -162,7 +163,7 @@ class AudioDataset(torch.utils.data.Dataset):
         self.filelist_path = config.data.train_filelist_path if self.training else config.data.test_filelist_path
         self.audio_paths = parse_filelist(self.filelist_path) if self.training else parse_filelist(self.filelist_path)[:101] 
 
-        self.filelist_f0, self.filelist_f0_norm = parse_f0_lists(self.filelist_path)
+        self.f0_norm_paths, self.f0_paths  = parse_f0_lists(self.filelist_path)
 
     def load_audio_to_torch(self, audio_path):
         # torchaudio load
@@ -207,7 +208,8 @@ class AudioDataset(torch.utils.data.Dataset):
 
         # Convert to Pytorch Tensor + Matching Shapes
         f0_norm = f0_norm.unsqueeze(0)
-        f0 = torch.from_numpy(f0).unsqueeze(0)
+        f0 = f0.unsqueeze(0)
+        # f0 = torch.from_numpy(f0).unsqueeze(0)
         # torch.Size([1, 2313]), torch.Size([1, 2313])
 
         assert sample_rate == self.sample_rate, \
